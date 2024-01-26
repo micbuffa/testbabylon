@@ -129,7 +129,6 @@ class Game {
         else if (this.inputMap["KeyD"]  && this.#sphere.position.x < 30)
             this.#sphere.position.x += 0.01 * delta;
 
-
         if (this.inputMap["KeyW"] && this.#sphere.position.z < 30)
             this.#sphere.position.z += 0.01 * delta;
         else if (this.inputMap["KeyS"]  && this.#sphere.position.z > -30)
