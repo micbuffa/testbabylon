@@ -1,4 +1,4 @@
-import { ActionManager, Color3, Color4, FreeCamera, HemisphericLight, InterpolateValueAction, Mesh, MeshBuilder, ParticleSystem, Scene, SetValueAction, ShadowGenerator, SpotLight, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { ActionManager, Color3, Color4, FreeCamera, HemisphericLight, InterpolateValueAction, KeyboardEventTypes, Mesh, MeshBuilder, ParticleSystem, Scene, SetValueAction, ShadowGenerator, SpotLight, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
 
 import floorUrl from "../assets/textures/floor.png";
 import floorBumpUrl from "../assets/textures/floor_bump.png";
@@ -12,6 +12,10 @@ class Game {
     #sphere;
 
     #phase = 0.0;
+    #vitesseY = 0.0018;
+
+    inputMap = {};
+    actions = {};
 
     constructor(canvas, engine) {
         this.#canvas = canvas;
@@ -67,14 +71,31 @@ class Game {
                 1000
             )
         );
-        
-    
+
+
 
         return scene;
     }
 
     initGame() {
         this.#gameScene = this.createScene();
+        this.initInput();
+    }
+
+    initInput() {
+        this.#gameScene.onKeyboardObservable.add((kbInfo) => {
+            switch (kbInfo.type) {
+                case KeyboardEventTypes.KEYDOWN:
+                    this.inputMap[kbInfo.event.code] = true;
+                    console.log(`KEY DOWN: ${kbInfo.event.code} / ${kbInfo.event.key}`);
+                    break;
+                case KeyboardEventTypes.KEYUP:
+                    this.inputMap[kbInfo.event.code] = false;
+                    this.actions[kbInfo.event.code] = true;
+                    console.log(`KEY UP: ${kbInfo.event.code} / ${kbInfo.event.key}`);
+                    break;
+            }
+        });
     }
 
     endGame() {
@@ -88,6 +109,8 @@ class Game {
 
             this.updateGame();
 
+            this.actions = {};
+
             divFps.innerHTML = this.#engine.getFps().toFixed() + " fps";
             this.#gameScene.render();
         });
@@ -97,8 +120,23 @@ class Game {
 
         let delta = this.#engine.getDeltaTime();
 
-        this.#phase += 0.0018 * delta;
+        this.#phase += this.#vitesseY * delta;
         this.#sphere.position.y = 2 + Math.sin(this.#phase);
+        this.#sphere.scaling.y = 1 + 0.125*Math.sin(this.#phase);
+
+        if (this.inputMap["KeyA"] && this.#sphere.position.x > -30)
+            this.#sphere.position.x -= 0.01 * delta;
+        else if (this.inputMap["KeyD"]  && this.#sphere.position.x < 30)
+            this.#sphere.position.x += 0.01 * delta;
+
+
+        if (this.inputMap["KeyW"] && this.#sphere.position.z < 30)
+            this.#sphere.position.z += 0.01 * delta;
+        else if (this.inputMap["KeyS"]  && this.#sphere.position.z > -30)
+            this.#sphere.position.z -= 0.01 * delta;
+
+        if (this.actions["Space"])
+            this.#vitesseY *= 1.25;
     }
 }
 
