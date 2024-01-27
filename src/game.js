@@ -10,6 +10,7 @@ class Game {
     #gameScene;
 
     #sphere;
+    #zoneA;
 
     #phase = 0.0;
     #vitesseY = 0.0018;
@@ -73,6 +74,12 @@ class Game {
         );
 
 
+        this.#zoneA = MeshBuilder.CreateBox("zoneA", {width:8, height:0.2, depth:8}, scene);
+        let zoneMat = new StandardMaterial("zoneA", scene);
+        zoneMat.diffuseColor = Color3.Red();
+        zoneMat.alpha = 0.5;
+        this.#zoneA.material = zoneMat;
+        this.#zoneA.position = new Vector3(12, 0.1, 12);
 
         return scene;
     }
@@ -120,10 +127,12 @@ class Game {
 
         let delta = this.#engine.getDeltaTime();
 
+        //Animation
         this.#phase += this.#vitesseY * delta;
         this.#sphere.position.y = 2 + Math.sin(this.#phase);
         this.#sphere.scaling.y = 1 + 0.125*Math.sin(this.#phase);
 
+        //Input et mouvements
         if (this.inputMap["KeyA"] && this.#sphere.position.x > -30)
             this.#sphere.position.x -= 0.01 * delta;
         else if (this.inputMap["KeyD"]  && this.#sphere.position.x < 30)
@@ -136,6 +145,13 @@ class Game {
 
         if (this.actions["Space"])
             this.#vitesseY *= 1.25;
+
+        //Collisions
+        if (this.#sphere.intersectsMesh(this.#zoneA, false))
+            this.#sphere.material.emissiveColor = Color3.Red();
+        else
+            this.#sphere.material.emissiveColor = Color3.Black();
+        
     }
 }
 

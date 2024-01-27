@@ -19,11 +19,8 @@ const babylonInit = async () => {
 
 
 
-window.onload = () => {
+babylonInit().then(() => {
+    const game = new Game(canvas, engine);
+    game.start();    
+});
 
-    babylonInit().then(() => {
-        const game = new Game(canvas, engine);
-        game.start();    
-    });
-
-}
