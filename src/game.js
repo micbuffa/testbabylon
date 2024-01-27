@@ -11,6 +11,7 @@ class Game {
 
     #sphere;
     #zoneA;
+    #zoneB;
 
     #phase = 0.0;
     #vitesseY = 0.0018;
@@ -80,6 +81,32 @@ class Game {
         zoneMat.alpha = 0.5;
         this.#zoneA.material = zoneMat;
         this.#zoneA.position = new Vector3(12, 0.1, 12);
+
+     
+        this.#zoneB = MeshBuilder.CreateBox("zoneB", {width:8, height:0.2, depth:8}, scene);
+        let zoneMatB = new StandardMaterial("zoneB", scene);
+        zoneMatB.diffuseColor = Color3.Green();
+        zoneMatB.alpha = 0.5;
+        this.#zoneB.material = zoneMatB;
+        this.#zoneB.position = new Vector3(-12, 0.1, -12);
+
+        sphere.actionManager.registerAction(
+            new SetValueAction(
+                { trigger: ActionManager.OnIntersectionEnterTrigger, parameter: this.#zoneB }, 
+                sphere.material,
+                'diffuseColor',
+                Color3.Green()
+            )
+        );
+            
+        sphere.actionManager.registerAction(
+            new SetValueAction(
+                { trigger: ActionManager.OnIntersectionExitTrigger, parameter: this.#zoneB }, 
+                sphere.material,
+                'diffuseColor',
+                sphere.material.diffuseColor
+            )
+        );
 
         return scene;
     }
